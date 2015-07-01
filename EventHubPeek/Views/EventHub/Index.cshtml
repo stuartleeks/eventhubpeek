@@ -1,0 +1,73 @@
+﻿@model EventHubPeek.Models.EventHub.IndexModel
+@{
+    ViewBag.Title = "Eventhub snapshot";
+}
+
+<h2>EventHub Snapshot</h2>
+
+@using (Html.BeginForm())
+{
+    <text>
+        <div>
+            @Html.LabelFor(m => m.ConnectionString)
+        </div>
+        <div>
+            @Html.EditorFor(m => m.ConnectionString)
+            @Html.ValidationMessageFor(m => m.ConnectionString)
+        </div>
+        <div>
+            @Html.LabelFor(m => m.ConsumerGroupName)
+        </div>
+        <div>
+            @Html.EditorFor(m => m.ConsumerGroupName)
+            @Html.ValidationMessageFor(m => m.ConsumerGroupName)
+        </div>
+        <div>
+            @Html.LabelFor(m => m.StartDateTimeUtc)
+        </div>
+        <div>
+            @Html.EditorFor(m => m.StartDateTimeUtc)
+            @Html.ValidationMessageFor(m => m.StartDateTimeUtc)
+        </div>
+        <div>
+            @Html.LabelFor(m => m.MaximumMessages)
+        </div>
+        <div>
+            @Html.EditorFor(m => m.MaximumMessages)
+            @Html.ValidationMessageFor(m => m.MaximumMessages)
+        </div>
+        <div>
+            @Html.LabelFor(m => m.MaximumWaitTime)
+        </div>
+        <div>
+            @Html.EditorFor(m => m.MaximumWaitTime)
+            @Html.ValidationMessageFor(m => m.MaximumWaitTime)
+        </div>
+        <div>
+            <input type="submit" value="Go" />
+        </div>
+    </text>
+}
+
+@if (Model.Messages != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Partition Id</td>
+                <td>Enqueued Time (UTC)</td>
+                <td>Body</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var message in Model.Messages)
+            {
+            <tr>
+                <td>@message.PartitionId</td>
+                <td>@message.EnqueuedTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>@message.Body</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}

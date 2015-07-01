@@ -1,0 +1,1 @@
+tools\nuget.exe pack .\EventHubPeek.nuspec -nopackageanalysis
