@@ -5,7 +5,7 @@
     <title>EventHub Peek</title>
     <version>0.1.0</version>
     <authors>Stuart Leeks</authors>
-    <licenseUrl>https://github.com/stuartleeks/eventhubpeek/license.md</licenseUrl>
+    <licenseUrl>https://github.com/stuartleeks/eventhubpeek/blob/master/license.md</licenseUrl>
     <projectUrl>https://github.com/stuartleeks/eventhubpeek</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A Site Extension to allow simple peeking into a snapshot of the messages in an Event Hub</description>
