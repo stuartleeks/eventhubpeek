@@ -3,13 +3,15 @@
   <metadata>
     <id>eventhubpeek</id>
     <title>EventHub Peek</title>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
     <authors>Stuart Leeks</authors>
     <licenseUrl>https://github.com/stuartleeks/eventhubpeek/blob/master/license.md</licenseUrl>
     <projectUrl>https://github.com/stuartleeks/eventhubpeek</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A Site Extension to allow simple peeking into a snapshot of the messages in an Event Hub</description>
     <tags>eventhub siteextension</tags>
+    <releaseNotes>Version 0.1.1 - minor UI tweaks
+    Version 0.1.0 - initial version</releaseNotes>
   </metadata>
   <files>
     <file src="artifacts\**\*.*" target="content" />
