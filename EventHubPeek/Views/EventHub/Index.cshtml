@@ -8,12 +8,22 @@
 @using (Html.BeginForm())
 {
     <text>
+
         <div>
-            @Html.LabelFor(m => m.ConnectionString)
+            @Html.LabelFor(m => m.ConnectionsInSettings)
         </div>
         <div>
-            @Html.EditorFor(m => m.ConnectionString)
-            @Html.ValidationMessageFor(m => m.ConnectionString)
+            @*@Html.DropDownListFor(m => m.ConnectionString, Model.ConnectionsInSettings)*@
+            @Html.DropDownList("InputConnectionStrings[0]", Model.ConnectionsInSettings, new { @class="connection-string"})
+            @Html.ValidationMessageFor(m => m.ConnectionsInSettings)
+        </div>
+        <div>
+            @Html.LabelFor(m => m.ManualConnectionString)
+        </div>
+        <div>
+            @*@Html.EditorFor(m => m.ConnectionString)*@
+            @Html.TextBox("InputConnectionStrings[1]", Model.ManualConnectionString, new { @class = "connection-string" })
+            @Html.ValidationMessageFor(m => m.ManualConnectionString)
         </div>
         <div>
             @Html.LabelFor(m => m.ConsumerGroupName)
@@ -48,8 +58,13 @@
         </div>
     </text>
 }
-
-@if (Model.Messages != null)
+@if (!string.IsNullOrEmpty(Model.OutputMessage))
+{
+    <div class="output-message">
+        @Model.OutputMessage
+    </div>
+}
+@if (Model.EventHubMessages != null)
 {
     <table class="table">
         <thead>
@@ -60,13 +75,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var message in Model.Messages)
+            @foreach (var message in Model.EventHubMessages)
             {
-            <tr>
-                <td>@message.PartitionId</td>
-                <td>@message.EnqueuedTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
-                <td>@message.Body</td>
-            </tr>
+                <tr>
+                    <td>@message.PartitionId</td>
+                    <td>@message.EnqueuedTimeUtc.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@message.Body</td>
+                </tr>
             }
         </tbody>
     </table>

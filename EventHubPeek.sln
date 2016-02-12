@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A862AE4E-4740-4695-A65D-B4463F5D9C8A}"
 	ProjectSection(SolutionItems) = preProject
 		build.cmd = build.cmd
+		BuildSteps.md = BuildSteps.md
 		EventHubPeek.nuspec = EventHubPeek.nuspec
 		license.md = license.md
 		readme.md = readme.md

@@ -8,21 +8,27 @@ using System.Web.Mvc;
 using EventHubPeek.Models.EventHub;
 using Microsoft.ServiceBus;
 using Microsoft.ServiceBus.Messaging;
+using EventHubPeek.Utils;
 
 namespace EventHubPeek.Controllers
 {
     public class EventHubController : Controller
     {
+        private const string APPSETTING_PREFIX = "APPSETTING_";
+
         [HttpGet]
         [Route("")]
         public ActionResult Index()
         {
+            var connections = GetConnectionsFromAppSettingsEnvironmentVariables();
             var model = new IndexModel
             {
-                ConsumerGroupName = "$Default",
+                ConsumerGroupName = "$Default", // was $Default
                 MaximumMessages = 100,
-                StartDateTimeUtc = DateTime.UtcNow.AddMinutes(-15),
-                MaximumWaitTime = "0:0:10"
+                StartDateTimeUtc = DateTime.UtcNow.AddMinutes(-5),
+                MaximumWaitTime = "0:0:10",
+                ConnectionsInSettings = ProjectSelectList(connections, null),
+                SelectedConnectionInSettings = null
             };
             return View(model);
         }
@@ -33,14 +39,25 @@ namespace EventHubPeek.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.Messages = await GetMessagesAsync(model);
+                try
+                {
+                    model.EventHubMessages = await GetMessagesAsync(model);
+                }
+                catch(Exception ex)
+                {
+                    model.OutputMessage = ex.Message;
+                }
             }
+            var connections = GetConnectionsFromAppSettingsEnvironmentVariables();
+            model.ConnectionsInSettings = ProjectSelectList(connections, model.SelectedConnectionInSettings);
+
             return View(model);
         }
 
         private async Task<IEnumerable<MessageInfo>> GetMessagesAsync(IndexModel model)
         {
-            string connectionString = model.ConnectionString;
+     
+            string connectionString = model.InputConnectionStrings.LastOrDefault(s=>!string.IsNullOrWhiteSpace(s)); // will get dropdown value then textbox value. Take textbox value as a preference
             string consumerGroupName = model.ConsumerGroupName;
             DateTime startingTimeUtc = model.StartDateTimeUtc;
             int maxMessages = model.MaximumMessages;
@@ -87,7 +104,7 @@ namespace EventHubPeek.Controllers
         {
             var messages = new List<EventData>(capacity: maximumMessages);
             TimeSpan maxWaitTime;
-            while (messages.Count < maximumMessages && ((maxWaitTime =  waitEndTimeUtc - DateTime.UtcNow) > TimeSpan.Zero))
+            while (messages.Count < maximumMessages && ((maxWaitTime = waitEndTimeUtc - DateTime.UtcNow) > TimeSpan.Zero))
             {
                 // TODO - base wait time on the time spent so far
                 var batch = await receiver.ReceiveAsync(maximumMessages - messages.Count, maxWaitTime);
@@ -120,8 +137,54 @@ namespace EventHubPeek.Controllers
         }
 
 
-    }
+        private static List<DefinedConnection> GetConnectionsFromAppSettingsEnvironmentVariables()
+        {
+            return Environment.GetEnvironmentVariables()
+                    .Cast<System.Collections.DictionaryEntry>()
+                    .Where(de => IsAnAppSetting(de) && LooksLikeAnEventHubConnectionString((string)de.Value))
+                    .Select(de =>
+                        new DefinedConnection
+                        {
+                            Name = ((string)de.Key).Substring(APPSETTING_PREFIX.Length),
+                            ConnectionString = ((string)de.Value)
+                        }
+                    )
+                    .ToList();
+        }
+        private static List<SelectListItem> ProjectSelectList(IEnumerable<DefinedConnection> connections, string selectedConnectionString)
+        {
+            return connections.Select(c => new SelectListItem
+            {
+                Text = c.Name + "(" + c.ConnectionString + ")",
+                Value = c.ConnectionString,
+                Selected = c.ConnectionString == selectedConnectionString
+            })
+            .Prepend( new SelectListItem())
+            .ToList();
+        }
 
+        private static bool IsAnAppSetting(System.Collections.DictionaryEntry de)
+        {
+            return ((string)de.Key).StartsWith(APPSETTING_PREFIX, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        private static bool LooksLikeAnEventHubConnectionString (string value)
+        {
+            if (value.IndexOf("sb://", StringComparison.Ordinal) < 0)
+            {
+                return false;
+            }
+            try
+            {
+                new ServiceBusConnectionStringBuilder(value);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+    }
 
     public static class TaskLinqExtensions
     {
