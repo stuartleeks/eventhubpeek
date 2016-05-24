@@ -1,5 +1,5 @@
 #Event Hub Peek
-A simple site extension to allow you to inspect a sample of the messages on an Event Hub
+A simple site extension for Azure App Service to allow you to inspect a sample of the messages on an Event Hub. It is published in the extensions gallery for easy installation: http://www.siteextensions.net/packages/eventhubpeek/
 
 ## Releases
 ### Version 0.2.0
